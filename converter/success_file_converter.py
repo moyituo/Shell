@@ -89,6 +89,7 @@ class ParseFileConverter(AbstractConverter):
                             'http://10.10.3.13:18082/group1/originalData/', '')
                         url = self.config_reader.get_fs_api()['fs_read_bucket'] + '/' + '/'.join(
                             url.split('/')[:-1])
+                        print(f"url: {url}")
                         upload_resp_json = self.fs.upload(default_space_id, download_path, file_name, url)
 
                         if "error" in upload_resp_json or not upload_resp_json.get('data'):
@@ -103,8 +104,12 @@ class ParseFileConverter(AbstractConverter):
                             id = row[0]
                             sql = 'UPDATE t_success_file SET file_name = %s, origin_file_info = %s WHERE id = %s'
                             params = (file_name, json.dumps(file_info), id)
-                            self.db.execute(connection, sql, params)
+                            print("----------------")
+                            print(params)
+                            # self.db.execute(connection, sql, params)
                             pbar.update(1)
+                            break
+                        break
                     finally:
                         if download_path and os.path.exists(download_path):
                             shutil.rmtree(os.path.dirname(download_path))
