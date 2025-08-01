@@ -1,9 +1,9 @@
 [fs]
 
-fs_read_bucket=""
+fs_read_bucket="sgmw-test-team"
 fs_upload_api = "http://10.10.3.14:20025/api/document/uploadFile"
 fs_client_api = "http://10.10.3.14:20025/api/document/client/uploadFile"
-default_space_id = 1
+default_space_id = 29
 
 [mysql]
 
