@@ -113,12 +113,12 @@ class ParseFileConverter(AbstractConverter):
 
                         # 拼接SQL语句
                         sql = 'UPDATE t_orienlink_program SET program_file_info = %s'
-                        params = [program_file_info]  # 初始化参数
+                        params = [json.dumps(program_file_info)]  # 初始化参数
 
                         # 如果有附件文件，追加更新语句
                         if attachment_file_info:
                             sql += ', upload_file_info = %s'
-                            params.append(attachment_file_info)
+                            params.append(json.dumps(attachment_file_info))
 
                         # 完成WHERE条件
                         sql += ' WHERE id = %s'

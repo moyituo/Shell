@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import json
 from tqdm import tqdm
 
 from converter.abstract_converter import AbstractConverter
@@ -75,7 +75,7 @@ class ViewConverter(AbstractConverter):
                         file_info = upload_resp_json.get('data')
 
                         sql = 'UPDATE t_node_tree SET file_info = %s FROM t_node_tree WHERE id = %s'
-                        params = (file_info, id)
+                        params = (json.dumps(file_info), id)
                         self.db.execute(connection, sql, params)
                         pbar.update(1)
                     finally:

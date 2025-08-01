@@ -1,6 +1,6 @@
 import os
 import shutil
-
+import json
 from tqdm import tqdm
 
 from converter.abstract_converter import AbstractConverter
@@ -69,7 +69,7 @@ class SimulinkConverter(AbstractConverter):
                         file_name = file_info.get('fileName')
 
                         sql = 'UPDATE t_simulink_file_info SET file_name = %s ,simulink_file_info = %s FROM t_simulink_file_info WHERE id = %s'
-                        params = (file_name, file_info, id)
+                        params = (file_name, json.dumps(file_info), id)
                         self.db.execute(connection, sql, params)
                         pbar.update(1)
                     finally:

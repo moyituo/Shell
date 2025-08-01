@@ -104,7 +104,7 @@ class ArrowConverter(AbstractConverter):
                         origin_file_name = file_info.get('fileName')
                         sql += 'origin_file_name = %s, ol_origin_file_info = %s'  # 拼接字段
                         params.append(origin_file_name)
-                        params.append(file_info)
+                        params.append(json.dumps(file_info))
 
                         # ------------------------------arrow_file_info--------------------------------
                         if row[3]:  # 如果有 arrow_file_info
@@ -122,15 +122,15 @@ class ArrowConverter(AbstractConverter):
                                 'http://10.10.3.13:18082/group1/originalData/', '')
                             arrow_file_info_path = "arrows/" + '/'.join(arrow_file_info_path.split('/')[:-1])
 
-                            file_info = self.upload_file(space_id, arrow_download_path, arrow_file_name,
+                            arrow_file_info = self.upload_file(space_id, arrow_download_path, arrow_file_name,
                                                          arrow_file_info_path, True)
-                            if file_info is None or not file_info.get('data'):
+                            if arrow_file_info is None or not arrow_file_info.get('data'):
                                 self.logger.error(f"id {id} arrow文件上传失败")
                                 pbar.update(1)
                                 continue
 
                             sql += ', ol_arrow_file_info = %s'
-                            params.append(file_info)
+                            params.append(json.dumps(arrow_file_info))
 
                         # 添加 WHERE 子句
                         sql += ' WHERE id = %s'

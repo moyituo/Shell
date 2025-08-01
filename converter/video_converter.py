@@ -96,7 +96,7 @@ class VideoConverter(AbstractConverter):
                                 continue
                             file_info = upload_resp_json.get('data')
                             update_sql += 'post_file_info = %s'  # 拼接字段
-                            params.append(file_info)
+                            params.append(json.dumps(file_info))
 
                         # --------------------------file_path---------------------------------
                         file_path_name = os.path.basename(file_path)
@@ -113,11 +113,11 @@ class VideoConverter(AbstractConverter):
                             self.logger.error(f'id {id} video upload error: {upload_resp_json}')
                             pbar.update(1)
                             continue
-                        file_info = upload_resp_json.get('data')
+                        video_file_info = upload_resp_json.get('data')
                         if 'poster_url' in update_sql:
                             update_sql += ', '  # 如果之前已经有 poster_url 字段，则用逗号分隔
                         update_sql += 'video_file_info = %s'  # 拼接字段
-                        params.append(file_info)
+                        params.append(json.dumps(video_file_info))
 
                         # 最后拼接 WHERE 子句
                         update_sql += ' WHERE id = %s'

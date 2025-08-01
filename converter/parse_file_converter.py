@@ -1,5 +1,6 @@
 import os
 import shutil
+import json
 
 from tqdm import tqdm
 
@@ -78,7 +79,7 @@ class ParseFileConverter(AbstractConverter):
                         file_name = file_info.get('fileName')
 
                         sql = 'UPDATE t_parse_file SET file_name = %s, file_info = %s WHERE id = %s'
-                        params = (file_name, file_info, id)
+                        params = (file_name, json.dumps(file_info), id)
                         self.db.execute(connection, sql, params)
                         pbar.update(1)
                     finally:

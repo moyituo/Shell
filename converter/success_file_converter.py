@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -101,7 +102,7 @@ class ParseFileConverter(AbstractConverter):
                         for row in rows:
                             id = row[0]
                             sql = 'UPDATE t_success_file SET file_name = %s, origin_file_info = %s WHERE id = %s'
-                            params = (file_name, file_info, id)
+                            params = (file_name, json.dumps(file_info), id)
                             self.db.execute(connection, sql, params)
                             pbar.update(1)
                     finally:
