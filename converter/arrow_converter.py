@@ -91,12 +91,15 @@ class ArrowConverter(AbstractConverter):
 
                         origin_file_info_path = origin_file_info_path.replace(
                             'http://10.10.3.13:18082/group1/originalData/', '')
+                        origin_file_info_path = origin_file_info_path.replace(
+                            'http://10.10.3.13:18082/group1/localUpload/', '')
                         origin_file_info_path = self.config_reader.get_fs_api()['fs_read_bucket'] + '/' + '/'.join(
                             origin_file_info_path.split('/')[:-1])
-
+                        print("1112123123123123123123123211")
+                        print(origin_file_info_path)
                         file_info = self.upload_file(space_id, origin_download_path, origin_file_name,
                                                      origin_file_info_path, True)
-                        if file_info is None or not file_info.get('data'):
+                        if file_info is None:
                             self.logger.error(f"id {id} 原始文件上传失败")
                             pbar.update(1)
                             continue
@@ -110,7 +113,8 @@ class ArrowConverter(AbstractConverter):
                         if row[3]:  # 如果有 arrow_file_info
                             arrow_file_info_json = json.loads(row[3])
                             arrow_file_info_path = arrow_file_info_json.get('path')
-                            arrow_file_name = os.path.basename(arrow_file_info_path)
+                            arrow_file_name = arrow_file_info_path.split('name=')[1].split('&')[0]
+
                             arrow_download_path = f'tmp/arrow_file/{id}/{arrow_file_name}'
 
                             download_success = self.dfs.download_file_by_url(arrow_file_info_path, arrow_download_path)
@@ -118,13 +122,16 @@ class ArrowConverter(AbstractConverter):
                                 self.logger.error(f"id {id} arrow文件下载失败")
                                 pbar.update(1)
                                 continue
-                            arrow_file_info_path = arrow_file_info_path.replace(
-                                'http://10.10.3.13:18082/group1/originalData/', '')
-                            arrow_file_info_path = "arrows/" + '/'.join(arrow_file_info_path.split('/')[:-1])
 
+                            arrow_file_info_path = "arrows/" + '/'.join(origin_file_info_path.split('/')[:-1])
+
+                            print('--==================')
+                            print(arrow_file_name)
+                            print(arrow_file_info_path)
                             arrow_file_info = self.upload_file(space_id, arrow_download_path, arrow_file_name,
-                                                         arrow_file_info_path, True)
-                            if arrow_file_info is None or not arrow_file_info.get('data'):
+                                                         arrow_file_info_path, False)
+                            if arrow_file_info is None :
+                                print("============+++++++++")
                                 self.logger.error(f"id {id} arrow文件上传失败")
                                 pbar.update(1)
                                 continue

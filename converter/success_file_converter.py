@@ -9,11 +9,11 @@ from utils.logger import create_logger
 from utils.mysql_connector import Database
 
 
-class ParseFileConverter(AbstractConverter):
+class SuccessConverter(AbstractConverter):
 
     def __init__(self):
         super().__init__()
-        self.logger = create_logger('parse_file_converter')
+        self.logger = create_logger('success_file_converter')
         self.db = Database(
             host=self.mysql_config['host'],
             port=self.mysql_config['port'],
@@ -71,14 +71,13 @@ class ParseFileConverter(AbstractConverter):
 
                         url = self.dfs.get_url_by_file_id(origin_file_id)
                         if not url:
-                            self.logger.error(','.join(ids), origin_file_id, file_name, 'Download failed',
-                                              'File not found in DFS')
+                            self.logger.error(f"{','.join(str(item) for item in ids)} not found: {origin_file_id}")
                             pbar.update(len(ids))
                             continue
                         download_success = self.dfs.download_file_by_url(url, download_path)
                         if not download_success:
-                            self.logger.error(','.join(ids), origin_file_id, file_name, 'Download failed',
-                                              'Failed to download from DFS')
+                            self.logger.error(
+                                f"{','.join(str(item) for item in ids)} Failed to download file: {origin_file_id}")
                             pbar.update(len(ids))
                             continue
 
@@ -90,11 +89,11 @@ class ParseFileConverter(AbstractConverter):
                         url = self.config_reader.get_fs_api()['fs_read_bucket'] + '/' + '/'.join(
                             url.split('/')[:-1])
                         print(f"url: {url}")
-                        upload_resp_json = self.fs.upload(default_space_id, download_path, file_name, url)
+                        upload_resp_json = self.fs.upload(default_space_id, download_path, file_name, url,True)
 
                         if "error" in upload_resp_json or not upload_resp_json.get('data'):
-                            self.logger.error(','.join(ids), origin_file_id, file_name, 'Upload failed',
-                                              'Failed to Upload MINIO')
+                            self.logger.error(
+                                f"{','.join(str(item) for item in ids)} Failed to upload file: {origin_file_id}")
                             pbar.update(len(ids))
                             continue
                         file_info = upload_resp_json.get('data')
@@ -106,16 +105,14 @@ class ParseFileConverter(AbstractConverter):
                             params = (file_name, json.dumps(file_info), id)
                             print("----------------")
                             print(params)
-                            # self.db.execute(connection, sql, params)
+                            self.db.execute(connection, sql, params)
                             pbar.update(1)
-                            break
-                        break
                     finally:
                         if download_path and os.path.exists(download_path):
                             shutil.rmtree(os.path.dirname(download_path))
                 connection.commit()
             except Exception as e:
-                self.logger.error(f"Exception occurred during conversion: {e}")
+                self.logger.error(f"Exception occurred during conversion: {e}",exc_info=True)
                 connection.rollback()
             finally:
                 connection.close()
